@@ -70,7 +70,7 @@ class RowPairCalculator:
         return buildings
     
     @staticmethod
-    def compute_tp_fn_fp(pred:np.ndarray, targ:np.ndarray, c:int):
+    def compute_tp_fn_fp(pred:np.ndarray, targ:np.ndarray, c:int) -> List[int]:
         """
         Computes the number of TPs, FNs, FPs, between a prediction (x) and a target (y) for the desired class (c)
 
@@ -85,23 +85,13 @@ class RowPairCalculator:
         return [TP, FN, FP]
         
     @classmethod
-    def damage_tp_fn_fp(cls, pred_d:np.ndarray, targ_d:np.ndarray, i:int):
-        """
-        Computes the TP, FN, and FP for 
-        
-        Args:
-            pred_d (np.ndarray): predicted building damage levels
-            targ_d (np.ndarray): target building damage levels
-            i (int): desired damage level
-        """
-        if i in np.unique(targ_d): return list(cls.compute_tp_fn_fp(pred_d, targ_d, i))
-        else: return [None, None, None]
-        
-    @classmethod
     def get_row_pair(cls, ph:PathHandler):
         """
+        Builds a row of TPs, FNs, and FPs for both the localization dataframe and the damage dataframe.
+        This pair of rows are built in the same function as damages are only assessed where buildings are predicted. 
+
         Args:
-            ph (PathHandler): path handler
+            ph (PathHandler): used to load the required prediction and target images
         """
         lp,dp,lt,dt = ph.load_images()
         lp_b,lt_b,dt_b = map(cls.extract_buildings, (lp,lt,dt)) # convert all damage scores 1-4 to 1
@@ -111,7 +101,7 @@ class RowPairCalculator:
 
         lrow = cls.compute_tp_fn_fp(lp_b, lt_b, 1)
         drow = []
-        for i in range(1,5): drow += cls.damage_tp_fn_fp(dp, dt, i)
+        for i in range(1,5): drow += cls.compute_tp_fn_fp(dp, dt, i)
         return lrow, drow
 
 class F1Recorder:
