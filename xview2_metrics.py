@@ -21,7 +21,7 @@ import pandas as pd
 from multiprocessing import Pool, cpu_count
 from pathlib import Path
 from PIL import Image
-from typing import Union
+from typing import Union, List
 
 class PathHandler:
     def __init__(self, pred_dir:Path, targ_dir:Path, img_id:str, test_hold:str):
